@@ -215,7 +215,7 @@ void HDC1080::getTemperatureHumidityRegisters(){
  */
 void HDC1080::setConfig(AcqModeConfig acqMode, TempResolutionConfig tRes, HumidityResolutionConfig hRes, HeaterConfig heater){
 	auto reg = (
-		static_cast<uint16_t>(acqMode) | 
+		static_cast<uint16_t>(acqMode) |
 		static_cast<uint16_t>(tRes) |
 		static_cast<uint16_t>(hRes) |
 		static_cast<uint16_t>(heater) );
