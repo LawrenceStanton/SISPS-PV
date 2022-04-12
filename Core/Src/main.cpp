@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "HDC1080.hpp"
+#include "SM72445.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +48,7 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-HDC1080 hdc = HDC1080(
+/* HDC1080 hdc = HDC1080(
 	HDC1080::AcqModeConfig::DUAL,
 	HDC1080::TempResolutionConfig::A_14BIT,
 	HDC1080::HumidityResolutionConfig::A_14BIT,
@@ -55,7 +56,7 @@ HDC1080 hdc = HDC1080(
 	0x0000u
 );
 
-I2C_HandleTypeDef * hdc1080_hi2c = & hi2c1;
+I2C_HandleTypeDef * hdc1080_hi2c = & hi2c1; */
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,14 +108,16 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
+	
+	
+
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		hdc.getTemperatureHumidity();
-		HAL_Delay(500);
+		
 		/* USER CODE END 3 */
 	}
 }
