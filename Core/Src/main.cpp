@@ -33,6 +33,10 @@ using namespace std;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define VIN_GAIN  0.105969f
+#define VOUT_GAIN 0.199029f
+#define IIN_GAIN  0.0f
+#define IOUT_GAIN 0.0f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -48,15 +52,9 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-/* HDC1080 hdc = HDC1080(
-	HDC1080::AcqModeConfig::DUAL,
-	HDC1080::TempResolutionConfig::A_14BIT,
-	HDC1080::HumidityResolutionConfig::A_14BIT,
-	HDC1080::HeaterConfig::OFF,
-	0x0000u
-);
+I2C_HandleTypeDef * sm72445_hi2c = &hi2c2;
 
-I2C_HandleTypeDef * hdc1080_hi2c = & hi2c1; */
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,7 +88,7 @@ int main(void) {
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
-
+	
 	/* USER CODE END Init */
 
 	/* Configure the system clock */
@@ -107,7 +105,9 @@ int main(void) {
 	MX_USART1_UART_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
-
+	SM72445 sm = SM72445(SM72445::I2CAddr::ADDR2, VIN_GAIN, VOUT_GAIN, IIN_GAIN, IOUT_GAIN);
+	SM72445::ThresholdsTypedef t;
+	UNUSED(t);
 	
 	
 
@@ -117,6 +117,8 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		t = sm.getThresholds();
+		HAL_Delay(1000);
 		
 		/* USER CODE END 3 */
 	}

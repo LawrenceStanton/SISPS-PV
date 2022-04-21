@@ -48,17 +48,20 @@
 /* Begin Public Class Definitions */
 class SM72445{
 	private:
-	struct VoltsCurrents;
+	template <typename U> struct QuadDataStruct;
+	template <typename U> struct VoltsCurrents;
+	
 	struct Sensors;
 	struct Offsets;
 	struct Thresholds;
 	struct ADCs;
-
-	enum class ReturnType : int;
+	
+	enum class Status : int;
 
 	public:
 	enum class I2CAddr : uint8_t;
 	enum class RegisterAddr : uint8_t;
+	enum class FreqPanelMode : uint8_t;
 	
 	typedef struct Sensors SensorsTypedef;
 	typedef struct Offsets OffsetsTypedef;
@@ -66,23 +69,68 @@ class SM72445{
 	typedef struct ADCs ADCsTypedef;
 
 
-	SM72445();
-	~SM72445();
+	SM72445(I2CAddr i2cAddr, float vInGain, float vOutGain, float iInGain, float iOutGain );
+	//inline ~SM72445(){ softReset(); }
 
+	ADCsTypedef getADC_Values();
 	SensorsTypedef getSensors();
 	OffsetsTypedef getOffsets();
+	ThresholdsTypedef getThresholds();
+
+	void enableADCOverride();
+	void disableADCOverride();
+
+	/* The following methods require enableADCOverride to be in effect. */
+	void setADCOverrideFreqPM(FreqPanelMode fpm);
+	void setADCOverrideMaxOutI(float iOutMax);
+	void setADCOverrideMaxOutV(float vOutMax);
+	//void setADCOverrideDeadTimeOff();		// Unimplemented
+	//void setADCOverrideDeadTimeOn();		// Unimplemented
+	
+	void enablePMOverride();
+	void disablePMOverride();
+	void setPM(bool en);		// Requires enablePMOverride to be in effect.
+
+	void softReset();
 
 	void setOffsets(OffsetsTypedef offsets);
 	void setThresholds(ThresholdsTypedef thresholds);
 
-
 	private:
 	I2CAddr i2cAddr;
+	float vInGain, vOutGain, iInGain, iOutGain;
 
 	static bool isWritableRegister(RegisterAddr reg);
 
-	static SM72445::ReturnType I2C_MemRead(uint8_t i2cAddr, uint8_t regAddr, uint8_t & pData, uint16_t size);
-	static SM72445::ReturnType I2C_MemWrite(uint8_t i2cAddr, uint8_t regAddr, uint8_t & pData, uint16_t size);
+	/**
+	 * @brief Read a single memory register from the SM72445, given a I2C address.
+	 * 
+	 * @param i2cAddr	The address of the SM72445 to read from.
+	 * @param regAddr	The address of the SM72445 internal register to read from.
+	 * @param pData		Pointer to a 64-bit unsigned integer to save data to.
+	 * @return SM72445::ResultType SM72445::ResultType::OK if success, else SM72445::ResultType::FAIL_I2C.
+	 *  
+	 * @note Set all unused bits of pData to 0.
+	 * @note The SM72445 registers are all 7 bytes wide (SM72445_REG_SIZE).
+	 * @note All bytes must be read in a single sequence.
+	 * @note Refer to Page 14 of the device datasheet for more information.
+	 */
+	static SM72445::Status I2C_MemRead (uint8_t i2cAddr, uint8_t regAddr, uint64_t & rData);
+
+	/**
+	 * @brief Write a single memory register from A SM72445, given an I2C address.
+	 * 
+	 * @param i2cAddr	The address of the SM72445 to write to.
+	 * @param regAddr	The address of the SM72445 internal register to write to.
+	 * @param pData		Pointer to a 64-bit unsigned integer to save data to.
+	 * @return SM72445::ResultType 
+	 * 
+	 * @note Set all unused bits of pData to 0.
+	 * @note The SM72445 registers are all 7 bytes wide (SM72445_REG_SIZE).
+	 * @note All bytes must be written in a single sequence.
+	 * @note Refer to Page 14 of the device datasheet for more information.
+	 */
+	static SM72445::Status I2C_MemWrite(uint8_t i2cAddr, const uint8_t regAddr, uint64_t data);
 
 };
 
@@ -105,38 +153,75 @@ enum class SM72445::RegisterAddr : uint8_t{
 	REG5 = 0xE5u
 };
 
-enum class SM72445::ReturnType : int{
+enum class FreqPanelMode : uint8_t{
+	//F_HGH_PM_SWITCH = 0x00u,	// Unsupported. Use alternative option.
+	F_MED_PM_SWITCH = 0x01u,
+	F_LOW_PM_SWITCH = 0x02u,
+	F_HGH_PM_BRIDGE = 0x03u,
+	F_MED_PM_BRIDGE = 0x04u,
+	F_LOW_PM_BRIDGE = 0x05u,
+	F_HGH_PM_SWITCH = 0x07u	
+};
+
+enum class SM72445::Status : int{
 	OK = 0,
 	FAIL_I2C = -1
 };
 
-struct SM72445::VoltsCurrents{ 
-	volatile uint16_t vIn;
-	volatile uint16_t vOut;
-	volatile uint16_t iIn;
-	volatile uint16_t iOut;
-	
-	VoltsCurrents(uint16_t vIn, uint16_t vOut, uint16_t iIn, uint16_t iOut, const uint16_t mask);
+template <typename U>
+struct SM72445::QuadDataStruct{
+	protected:
+	uint8_t bitsize;
+	U data[4];
+
+	public:
+	QuadDataStruct();
+	QuadDataStruct(const uint8_t bitsize, U u1, U u2, U u3, U u4);
+	QuadDataStruct(const uint8_t bitsize, uint64_t bigData);
 };
 
-struct SM72445::Offsets : virtual VoltsCurrents{ Offsets(uint16_t vIn, uint16_t vOut, uint16_t iIn, uint16_t iOut); };
-struct SM72445::Sensors : virtual VoltsCurrents{ Sensors(uint16_t vIn, uint16_t vOut, uint16_t iIn, uint16_t iOut); };
-struct SM72445::ADCs{
-	uint16_t ADC0;
-	uint16_t ADC2;
-	uint16_t ADC4;
-	uint16_t ADC6;
+template <typename U>
+struct SM72445::VoltsCurrents : QuadDataStruct<U>{ 
+	U * vOut = this->data[3];
+	U * iOut = this->data[2];
+	U * vIn  = this->data[1];
+	U * iIn  = this->data[0];
 
+	VoltsCurrents();
+	VoltsCurrents(const uint8_t bitsize, U u1, U u2, U u3, U u4);
+	VoltsCurrents(const uint8_t bitsize, uint64_t bigData);
+};
+
+struct SM72445::ADCs : QuadDataStruct<uint16_t>{
+	uint16_t * ADC6 = &this->data[3];
+	uint16_t * ADC4 = &this->data[2];
+	uint16_t * ADC2 = &this->data[1];
+	uint16_t * ADC0 = &this->data[0];
+
+	ADCs();
 	ADCs(uint16_t ADC0, uint16_t ADC2, uint16_t ADC4, uint16_t ADC6);
+	ADCs(uint64_t bigData);
 };
 
-struct SM72445::Thresholds{
-	uint16_t iInHigh;
-	uint16_t iInLow;
-	uint16_t iOutHigh;
-	uint16_t iOutLow;
+struct SM72445::Thresholds : QuadDataStruct<uint16_t>{
+	uint16_t * iInHigh  = &this->data[3];
+	uint16_t * iInLow   = &this->data[2];
+	uint16_t * iOutHigh = &this->data[1];
+	uint16_t * iOutLow  = &this->data[0];
 
+	Thresholds();
 	Thresholds(uint16_t iInHigh, uint16_t iInLow, uint16_t iOutHigh, uint16_t iOutLow);
+	Thresholds(uint64_t bigData);
+};
+
+struct SM72445::Offsets : VoltsCurrents<uint8_t>{
+	Offsets();
+	Offsets(uint64_t bigData);
+};
+
+struct SM72445::Sensors : VoltsCurrents<uint16_t>{
+	Sensors();
+	Sensors(uint64_t bigData);
 };
 
 

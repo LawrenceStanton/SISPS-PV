@@ -140,7 +140,7 @@ class HDC1080{
 	enum class HeaterConfig : uint16_t;
 	enum class TempResolutionConfig : uint16_t;
 	enum class HumidityResolutionConfig : uint16_t;
-	enum class ResultType : int;
+	enum class Status : int;
 	
 	/* Constructors and Destructors */
 	HDC1080( 
@@ -217,7 +217,7 @@ class HDC1080{
 	 * @param memAddr	The starting internal memory address to read from.
 	 * @param pData		Pointer to memory allocated for saving data read.
 	 * @param size		The size of pData, which is the amount of data to read over I2C.
-	 * @return HDC1080::ResultType HDC1080::ResultType::OK if success, else HDC1080::ResultType::FAIL_I2C.
+	 * @return HDC1080::Status HDC1080::Status::OK if success, else HDC1080::Status::FAIL_I2C.
 	 * 
 	 * @note This method must be implemented by host application and based on the specific host system infrastructure.
 	 * 
@@ -228,7 +228,7 @@ class HDC1080{
 	 * @note ID should be used to determine which physical I2C interface to use if there are multiple HDC1080s.
 	 * 		 Else this parameter is unused.
 	 */
-	static HDC1080::ResultType I2C_MemRead (uint8_t ID, uint8_t i2cAddr, uint8_t memAddr, uint8_t * pData, uint16_t size);
+	static HDC1080::Status I2C_MemRead (uint8_t ID, uint8_t i2cAddr, uint8_t memAddr, uint8_t * pData, uint16_t size);
 	
 
 	/**
@@ -239,7 +239,7 @@ class HDC1080{
 	 * @param memAddr	The starting internal memory address to write to.
 	 * @param pData		Pointer to data to be written.
 	 * @param size		The size of pData, which is the amount of data to written over I2C.
-	 * @return HDC1080::ResultType HDC1080::ResultType::OK if success, else HDC1080::ResultType::FAIL_I2C.
+	 * @return HDC1080::Status HDC1080::Status::OK if success, else HDC1080::Status::FAIL_I2C.
 	 * 
 	 * @note This method must be implemented by host application and based on the specific host system infrastructure.
 	 * 
@@ -250,7 +250,7 @@ class HDC1080{
 	 * @note ID should be used to determine which physical I2C interface to use if there are multiple HDC1080s.
 	 * 		 Else this parameter is unused.
 	 */
-	static HDC1080::ResultType I2C_MemWrite(uint8_t ID, uint8_t i2cAddr, uint8_t memAddr, uint8_t * pData, uint16_t size);
+	static HDC1080::Status I2C_MemWrite(uint8_t ID, uint8_t i2cAddr, uint8_t memAddr, uint8_t * pData, uint16_t size);
 	
 	/**
 	 * @brief Send data onto the I2C bus, given the I2C address of the device to send to.
@@ -259,7 +259,7 @@ class HDC1080{
 	 * @param i2cAddr	The I2C address. This driver will only ever call this with HDC1080_I2C_ADDR (0x40).
 	 * @param pData		Pointer to data to be sent.
 	 * @param size		Size of pData, which is the amount of data to send.
-	 * @return HDC1080::ResultType HDC1080::ResultType::OK if success, else HDC1080::ResultType::FAIL_I2C.
+	 * @return HDC1080::Status HDC1080::Status::OK if success, else HDC1080::Status::FAIL_I2C.
 	 * 
 	 * @note This method must be implemented by host application and based on the specific host system infrastructure.
 	 * 
@@ -271,7 +271,7 @@ class HDC1080{
 	 * @note ID should be used to determine which physical I2C interface to use if there are multiple HDC1080s.
 	 * 		 Else this parameter is unused. 
 	 */
-	static HDC1080::ResultType I2C_Transmit(uint8_t ID, uint8_t i2cAddr, uint8_t * pData, uint16_t size);
+	static HDC1080::Status I2C_Transmit(uint8_t ID, uint8_t i2cAddr, uint8_t * pData, uint16_t size);
 	
 	/**
 	 * @brief Receive data from the I2C bus, given the I2C address of the device that will send data.
@@ -280,7 +280,7 @@ class HDC1080{
 	 * @param i2cAddr	The I2C address. This driver will only ever call this with HDC1080_I2C_ADDR (0x40).
 	 * @param pData		Pointer to memory to save received data to.
 	 * @param size		Size of pData, which is the amount of data to receive.
-	 * @return HDC1080::ResultType HDC1080::ResultType::OK if success, else HDC1080::ResultType::FAIL_I2C.
+	 * @return HDC1080::Status HDC1080::Status::OK if success, else HDC1080::Status::FAIL_I2C.
 	 * 
 	 * @note This method must be implemented by host application and based on the specific host system infrastructure.
 	 * 
@@ -292,7 +292,7 @@ class HDC1080{
 	 * @note ID should be used to determine which physical I2C interface to use if there are multiple HDC1080s.
 	 * 		 Else this parameter is unused. 
 	 */
-	static HDC1080::ResultType I2C_Receive (uint8_t ID, uint8_t i2cAddr, uint8_t * pData, uint16_t size);
+	static HDC1080::Status I2C_Receive (uint8_t ID, uint8_t i2cAddr, uint8_t * pData, uint16_t size);
 	
 	/**
 	 * @brief Delay the program execution by a set amount of time
@@ -303,7 +303,7 @@ class HDC1080{
 	 * 
 	 * @note This need not be a precise delay.
 	 */
-	static void Delay(uint16_t ms);
+	static inline void Delay(uint16_t ms);
 
 	/*************************************************************************************************************************************/
 };
@@ -344,7 +344,7 @@ enum class HDC1080::HumidityResolutionConfig : uint16_t{
 /**
  * @brief Internal method status return type / error code enumerable.
  */
-enum class HDC1080::ResultType : int{
+enum class HDC1080::Status : int{
 	OK = 0,
 	FAIL_I2C = -1,
 	FAIL_INVALID_PARAMETER = -2

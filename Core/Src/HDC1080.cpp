@@ -246,7 +246,7 @@ uint64_t HDC1080::getSerialID(){
 uint16_t HDC1080::getRegister(uint8_t memAddr){
 	uint16_t data;
 	auto hdcResult = I2C_MemRead(this->ID, HDC1080_I2C_ADDR, memAddr, (uint8_t *) &data, HDC1080_MEM_SIZE);
-	return (hdcResult == HDC1080::ResultType::OK) ? __HDC1080_UINT16_REVERSE_CAST(data) : 0x0000u;
+	return (hdcResult == HDC1080::Status::OK) ? __HDC1080_UINT16_REVERSE_CAST(data) : 0x0000u;
 }
 
 /**
@@ -274,11 +274,11 @@ void HDC1080::setRegister(uint8_t memAddr, uint16_t data){
  * @note In the event of communication failure, writes 0x0000u to all scoped values of *pData.
  */
 void HDC1080::getMeasurementRegisters(uint8_t memAddr, uint16_t waitTime, uint16_t * pData, uint8_t n){
-	if(I2C_Transmit(this->ID, HDC1080_I2C_ADDR, &memAddr, 1) == HDC1080::ResultType::OK){
+	if(I2C_Transmit(this->ID, HDC1080_I2C_ADDR, &memAddr, 1) == HDC1080::Status::OK){
 		Delay(waitTime);
 		
 		auto hdcResult = I2C_Receive(this->ID, HDC1080_I2C_ADDR, (uint8_t *)pData, n*2);
-		if(hdcResult == HDC1080::ResultType::OK){
+		if(hdcResult == HDC1080::Status::OK){
 			for(int i = 0; i < n; i++) pData[i] = __HDC1080_UINT16_REVERSE_CAST(pData[i]);
 		}
 		else for(int i = 0; i < n; i++) pData[i] = 0x0000u;
@@ -294,33 +294,33 @@ void HDC1080::getMeasurementRegisters(uint8_t memAddr, uint16_t waitTime, uint16
 #define HDC1080_USE_STM32_HAL_METHODS
 #ifdef HDC1080_USE_STM32_HAL_METHODS
 
-#include "stm32g0xx_hal.h"	// STM32 HAL driver to be included. Adjust depending on the STM32 platoform.
+#include "stm32g0xx_hal.h"	// STM32 HAL driver to be included. Adjust depending on the STM32 platform.
 
 extern I2C_HandleTypeDef * hdc1080_hi2c;	// Pointer to the HAL I2C handle for the I2C interface that the HDC1080 is on.
 											// Define this variable in main.cpp.
 
-HDC1080::ResultType HDC1080::I2C_MemRead(uint8_t ID, uint8_t I2C_Addr, uint8_t memAddr, uint8_t * pData, uint16_t size){
+HDC1080::Status HDC1080::I2C_MemRead(uint8_t ID, uint8_t I2C_Addr, uint8_t memAddr, uint8_t * pData, uint16_t size){
 	(void)ID;	// Unused
 	HAL_StatusTypeDef halResult = HAL_I2C_Mem_Read(hdc1080_hi2c, (I2C_Addr<<1), memAddr, 1, pData, size, 100);
-	return (halResult == HAL_OK) ? HDC1080::ResultType::OK : HDC1080::ResultType::FAIL_I2C;
+	return (halResult == HAL_OK) ? HDC1080::Status::OK : HDC1080::Status::FAIL_I2C;
 }
 
-HDC1080::ResultType HDC1080::I2C_MemWrite(uint8_t ID, uint8_t I2C_Addr, uint8_t memAddr, uint8_t * pData, uint16_t size){
+HDC1080::Status HDC1080::I2C_MemWrite(uint8_t ID, uint8_t I2C_Addr, uint8_t memAddr, uint8_t * pData, uint16_t size){
 	(void)ID;	// Unused
 	HAL_StatusTypeDef halResult = HAL_I2C_Mem_Write(hdc1080_hi2c, (I2C_Addr<<1), memAddr, 1, pData, size, 100);
-	return (halResult == HAL_OK) ? HDC1080::ResultType::OK : HDC1080::ResultType::FAIL_I2C;
+	return (halResult == HAL_OK) ? HDC1080::Status::OK : HDC1080::Status::FAIL_I2C;
 }
 
-HDC1080::ResultType HDC1080::I2C_Transmit(uint8_t ID, uint8_t I2C_Addr, uint8_t * pData, uint16_t size){
+HDC1080::Status HDC1080::I2C_Transmit(uint8_t ID, uint8_t I2C_Addr, uint8_t * pData, uint16_t size){
 	(void)ID;	// Unused
 	HAL_StatusTypeDef halResult =  HAL_I2C_Master_Transmit(hdc1080_hi2c, (I2C_Addr << 1), pData, size, 100);
-	return (halResult == HAL_OK) ? HDC1080::ResultType::OK : HDC1080::ResultType::FAIL_I2C;
+	return (halResult == HAL_OK) ? HDC1080::Status::OK : HDC1080::Status::FAIL_I2C;
 }
 
-HDC1080::ResultType HDC1080::I2C_Receive(uint8_t ID, uint8_t I2C_Addr, uint8_t * pData, uint16_t size){
+HDC1080::Status HDC1080::I2C_Receive(uint8_t ID, uint8_t I2C_Addr, uint8_t * pData, uint16_t size){
 	(void)ID;	// Unused
 	HAL_StatusTypeDef halResult =  HAL_I2C_Master_Receive(hdc1080_hi2c, (I2C_Addr << 1), pData, size, 100);
-	return (halResult == HAL_OK) ? HDC1080::ResultType::OK : HDC1080::ResultType::FAIL_I2C;
+	return (halResult == HAL_OK) ? HDC1080::Status::OK : HDC1080::Status::FAIL_I2C;
 }
 
 void HDC1080::Delay(uint16_t ms){
