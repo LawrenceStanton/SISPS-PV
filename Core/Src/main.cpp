@@ -106,20 +106,20 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 	SM72445 sm = SM72445(SM72445::I2CAddr::ADDR2, VIN_GAIN, VOUT_GAIN, IIN_GAIN, IOUT_GAIN);
-	SM72445::ThresholdsTypedef t;
-	UNUSED(t);
-	
-	
-
+	SM72445::Thresholds th;
+	SM72445::Sensors vi;
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		t = sm.getThresholds();
-		HAL_Delay(1000);
-		
+		vi = sm.getSensors();
+ 		th.iInLow = 30;
+		sm.setThresholds(th);
+		th = SM72445::Thresholds();
+ 		th = sm.getThresholds();
+		HAL_Delay(500);
 		/* USER CODE END 3 */
 	}
 }
