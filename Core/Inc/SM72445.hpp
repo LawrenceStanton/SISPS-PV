@@ -46,12 +46,15 @@
 /* End Public Function Prototypes */
 
 /* Begin Public Class Definitions */
+/**
+ * @brief Main class for SM72445.
+ * 
+ * @note Refer to source code definitions for all documentation on the declarations of this class.
+ */
 class SM72445{
 	protected:
 	template <typename T> struct QuadDataStruct;
 	template <typename T> struct VoltsCurrents;
-
-	struct Config;
 	
 	enum class Status : int;
 
@@ -66,7 +69,6 @@ class SM72445{
 	struct Thresholds;
 
 	SM72445(I2CAddr i2cAddr, float vInGain, float vOutGain, float iInGain, float iOutGain );
-	//inline ~SM72445(){ softReset(); }
 
 	ADCs getADC_Values();
 	Sensors getSensors();
@@ -77,6 +79,7 @@ class SM72445{
 	void setADCOverrideFreqPM(FreqPanelMode fpm);
 	void setADCOverrideMaxOutI(float iOutMax);
 	void setADCOverrideMaxOutV(float vOutMax);
+	void setADCOverrideMaxOutVI(float vOutMax, float iOutMax);
 	//void setADCOverrideDeadTimeOff();		// Unimplemented
 	//void setADCOverrideDeadTimeOn();		// Unimplemented
 	
@@ -94,26 +97,15 @@ class SM72445{
 	float vInGain, vOutGain, iInGain, iOutGain;
 	bool adcOverride = false;
 
-	void setADCOverrideMaxOutVI(float viOutMax, float gain, uint8_t offset, uint64_t mask);
+	void setADCOverrideMaxOut(float viOutMax, float gain, uint8_t offset, uint64_t mask);
 
 	template<class T> T get(RegisterAddr regAddr);
 	template<class T> void set(RegisterAddr regAddr, T reg);
-
-	static bool isWritableRegister(RegisterAddr reg);
 
 	static SM72445::Status I2C_WriteBits(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits, uint64_t mask);
 	static SM72445::Status I2C_SetBits(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits);
 	static SM72445::Status I2C_ResetBits(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits);
 
-	/**
-	 * @brief Template function that can be used to modify a register based on the .
-	 * 
-	 * @param i2cAddr	The address of the SM72445 to act upon.
-	 * @param regAddr	The address of the SM72445 internal register to act upon.
-	 * @param bits		Mask of bits that are to be set or reset.
-	 * @param setReset  
-	 * @return SM72445::Status 
-	 */
 	template<typename T>
 	static uint64_t I2C_Mutate(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits, T&& action, uint64_t mask = 0x0u);
 
@@ -154,6 +146,9 @@ class SM72445{
 
 };
 
+/**
+ * @brief Enumerable for all possible SM72445 I2C addresses.
+ */
 enum class SM72445::I2CAddr : uint8_t{
 	ADDR1 = 0x1u,
 	ADDR2 = 0x2u,
@@ -164,6 +159,9 @@ enum class SM72445::I2CAddr : uint8_t{
 	ADDR7 = 0x7u
 };
 
+/**
+ * @brief Enumerable for all possible SM72445 register addresses. 
+ */
 enum class SM72445::RegisterAddr : uint8_t{
 	REG0 = 0xE0u,
 	REG1 = 0xE1u,
@@ -173,7 +171,10 @@ enum class SM72445::RegisterAddr : uint8_t{
 	REG5 = 0xE5u
 };
 
-enum class FreqPanelMode : uint8_t{
+/**
+ * @brief Enumerable for all possible SM72445 Frequency and Panel Mode Settings 
+ */
+enum class SM72445::FreqPanelMode : uint8_t{
 	//F_HGH_PM_SWITCH = 0x00u,	// Unsupported. Use alternative option.
 	F_MED_PM_SWITCH = 0x01u,
 	F_LOW_PM_SWITCH = 0x02u,
@@ -183,27 +184,40 @@ enum class FreqPanelMode : uint8_t{
 	F_HGH_PM_SWITCH = 0x07u	
 };
 
+/**
+ * @brief Enumerable for all supported function return statuses.
+ */
 enum class SM72445::Status : int{
 	OK = 0,
 	FAIL_I2C = -1
 };
 
+/**
+ * @brief Template structure for sets of 4 independent variables used in most registers of the SM72445.
+ * 
+ * @tparam T The minimum-sized data type of the register variables.
+ */
 template <typename T>
 struct SM72445::QuadDataStruct{
 	protected:
 	uint8_t bitsize;
 	T data[4];
 
-	public:
 	QuadDataStruct();
 	QuadDataStruct(const uint8_t bitsize, T u1, T u2, T u3, T u4);
 	QuadDataStruct(const uint8_t bitsize, uint64_t reg);
 
-	uint64_t toReg();
-
 	QuadDataStruct & operator = (const QuadDataStruct & qds) = default;
+
+	public:
+	uint64_t toReg();
 };
 
+/**
+ * @brief Derivative of QuadDataStruct that adds references variables.
+ * 
+ * @tparam T The minimum-sized data type of the register variables.
+ */
 template <typename T>
 struct SM72445::VoltsCurrents : QuadDataStruct<T>{
 	T & vOut { this->data[3] };
@@ -211,6 +225,7 @@ struct SM72445::VoltsCurrents : QuadDataStruct<T>{
 	T & vIn  { this->data[1] };
 	T & iIn  { this->data[0] };
 
+	protected:
 	VoltsCurrents();
 	VoltsCurrents(const uint8_t bitsize, T vOut, T iOut, T vIn, T iIn);
 	VoltsCurrents(const uint8_t bitsize, uint64_t reg);
@@ -218,6 +233,10 @@ struct SM72445::VoltsCurrents : QuadDataStruct<T>{
 	VoltsCurrents & operator = (const VoltsCurrents & vc);
 };
 
+/**
+ * @brief Derivative of QuadDataStruct for specifically the SM72445 ADC register 0.
+ * 
+ */
 struct SM72445::ADCs : QuadDataStruct<uint16_t>{
 	uint16_t & ADC6 { this->data[3] };
 	uint16_t & ADC4 { this->data[2] };
@@ -230,6 +249,10 @@ struct SM72445::ADCs : QuadDataStruct<uint16_t>{
 	ADCs & operator = (const ADCs & adc);
 };
 
+/**
+ * @brief Derivative of QuadDataStruct for specifically the SM72445 sensor register 1.
+ * 
+ */
 struct SM72445::Sensors : VoltsCurrents<uint16_t>{
 	Sensors();
 	Sensors(uint64_t reg);
@@ -237,14 +260,22 @@ struct SM72445::Sensors : VoltsCurrents<uint16_t>{
 	Sensors & operator = (const Sensors & sensor);
 };
 
-struct SM72445::Offsets : VoltsCurrents<uint8_t>{
+/**
+ * @brief Derivative of QuadDataStruct for specifically the SM72445 offsets register 4.
+ * 
+ */
+struct SM72445::Offsets : VoltsCurrents<int8_t>{
 	Offsets();
-	Offsets(uint8_t vOut, uint8_t iOut, uint8_t vIn, uint8_t iIn);
+	Offsets(int8_t vOut, int8_t iOut, int8_t vIn, int8_t iIn);
 	Offsets(uint64_t reg);
 
 	Offsets & operator = (const Offsets & offsets);
 };
 
+/**
+ * @brief Derivative of QuadDataStruct for specifically the SM72445 thresholds register 5.
+ * 
+ */
 struct SM72445::Thresholds : QuadDataStruct<uint16_t>{
 	uint16_t & iInHigh  { this->data[3] };
 	uint16_t & iInLow   { this->data[2] };

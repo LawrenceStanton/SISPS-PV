@@ -106,8 +106,14 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 	SM72445 sm = SM72445(SM72445::I2CAddr::ADDR2, VIN_GAIN, VOUT_GAIN, IIN_GAIN, IOUT_GAIN);
-	SM72445::Thresholds th;
-	SM72445::Sensors vi;
+	SM72445::Thresholds th = sm.getThresholds();
+	SM72445::Sensors vi = sm.getSensors();
+	SM72445::Offsets os = sm.getOffsets();
+
+	sm.setADCOverrideFreqPM(SM72445::FreqPanelMode::F_MED_PM_SWITCH);
+	sm.setADCOverrideMaxOutI(0.5);
+	sm.setADCOverrideMaxOutV(10.0);
+	sm.enablePMOverride();
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
@@ -115,10 +121,14 @@ int main(void) {
 
 		/* USER CODE BEGIN 3 */
 		vi = sm.getSensors();
- 		th.iInLow = 30;
-		sm.setThresholds(th);
-		th = SM72445::Thresholds();
  		th = sm.getThresholds();
+		os = sm.getOffsets();
+
+		sm.setPM(true);
+		sm.setPM(false);
+
+
+
 		HAL_Delay(500);
 		/* USER CODE END 3 */
 	}
