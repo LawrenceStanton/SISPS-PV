@@ -3,7 +3,6 @@
   * @file           : HDC1080.hpp
   * @brief          : Header file for HDC1080.cpp
   * @author			: Lawrence Stanton
-  * @revised		: Mar 27, 2022
   ******************************************************************************
   * @attention
   *
@@ -20,11 +19,12 @@
 #ifndef INC_HDC1080_HPP_
 #define INC_HDC1080_HPP_
 
-
+/* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
 #include <stdio.h>	// Used for int_t types.
 /* End Public Includes */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Defines */
 
 /**
@@ -82,6 +82,7 @@
 
 /* End Public Defines */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Macros */
 
 /**
@@ -102,17 +103,25 @@
 
 /* End Public Macros */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Typedefs */
-
 
 
 /* End Public Typedefs */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Global Public Variables */
 
 
 /* End Global Public Variables */
 
+/* --------------------------------------------------------------------------- */
+/* Begin Public Function Prototypes */
+
+
+/* End Public Function Prototypes */
+
+/* --------------------------------------------------------------------------- */
 /* Begin Public Class Definitions */
 
 /**
@@ -207,7 +216,7 @@ class HDC1080{
 
 
 	/*************************************************************************************************************************************
-	 * System-level I2C communication methods. To be implemented by host applciaiton. */
+	 * System-level I2C communication methods. To be implemented by host application. */
 
 	/**
 	 * @brief Read a set amount of data via the I2C interface, given the device I2C and internal memory addresses.

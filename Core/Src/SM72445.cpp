@@ -3,7 +3,6 @@
   * @file           : SM72245.cpp
   * @brief          : Driver for SM7245 MPPT Controller
   * @author			: Lawrence Stanton
-  * @revised		: 11 Apr 2022
   ******************************************************************************
   * @attention
   *

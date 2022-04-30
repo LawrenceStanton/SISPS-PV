@@ -3,7 +3,6 @@
   * @file           : SM72245.hpp
   * @brief          : Header file for SM72445.cpp
   * @author			: Lawrence Stanton
-  * @revised		: 11 Apr 2022
   ******************************************************************************
   * @attention
   *
@@ -17,34 +16,41 @@
   ******************************************************************************
   */
 
+/* --------------------------------------------------------------------------- */
 #ifndef INC_SM72245_HPP_
 #define INC_SM72245_HPP_
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
 #pragma once
 #include <stdio.h>
 /* End Public Includes */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Defines */
 #define SM72445_REG_SIZE 7
 
 /* End Public Defines */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Typedefs */
 
 
 /* End Public Typedefs */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Global Public Variables */
 
 
 /* End Global Public Variables */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Function Prototypes */
 
 
 /* End Public Function Prototypes */
 
+/* --------------------------------------------------------------------------- */
 /* Begin Public Class Definitions */
 /**
  * @brief Main class for SM72445.
@@ -110,7 +116,7 @@ class SM72445{
 	static uint64_t I2C_Mutate(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits, T&& action, uint64_t mask = 0x0u);
 
 	/*************************************************************************************************************************************
-	 * System-level I2C communication methods. To be implemented by host applciaiton. */
+	 * System-level I2C communication methods. To be implemented by host application. */
 
 	/**
 	 * @brief Read a single memory register from the SM72445, given a I2C address.

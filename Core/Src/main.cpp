@@ -1,26 +1,31 @@
 /* USER CODE BEGIN Header */
 /**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file           : main.cpp
+  * @brief          : Main program file for SISPS-PV.
+  * @author			: Lawrence Stanton
+  ******************************************************************************
+  * @attention
+  *
+  * © LD Stanton 2022
+  * 
+  * This file and its content are the copyright property of the author. All 
+  * rights are reserved. No warranty is given. No liability is assumed.
+  * Confidential unless licensed otherwise. If licensed, refer to the 
+  * accompanying file "LICENCE" for license details.
+  * 
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
+  * 
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+//#include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "main.hpp"
 #include "HDC1080.hpp"
 #include "SM72445.hpp"
 /* USER CODE END Includes */
@@ -33,10 +38,13 @@ using namespace std;
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SISPS_PV_BOARD_REVISION 0
+
+
 #define VIN_GAIN  0.105969f
 #define VOUT_GAIN 0.199029f
-#define IIN_GAIN  0.0f
-#define IOUT_GAIN 0.0f
+#define IIN_GAIN  0.8f
+#define IOUT_GAIN 0.8f
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -112,24 +120,27 @@ int main(void) {
 
 	sm.setADCOverrideFreqPM(SM72445::FreqPanelMode::F_MED_PM_SWITCH);
 	sm.setADCOverrideMaxOutI(0.5);
-	sm.setADCOverrideMaxOutV(10.0);
-	sm.enablePMOverride();
+	sm.setADCOverrideMaxOutV(0.0);
+	//sm.enablePMOverride();
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+	//	sm.setPM(true);
+	//	sm.setPM(false);
+
+		HAL_GPIO_TogglePin()
+		GPIO_PinState
+
+		sm.setADCOverrideMaxOutV(14.0);
+		HAL_Delay(1000);
 		vi = sm.getSensors();
- 		th = sm.getThresholds();
-		os = sm.getOffsets();
 
-		sm.setPM(true);
-		sm.setPM(false);
-
-
-
-		HAL_Delay(500);
+		sm.setADCOverrideMaxOutV(0.0);
+		HAL_Delay(1000);
+		vi = sm.getSensors();
 		/* USER CODE END 3 */
 	}
 }

@@ -1,19 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
+  * @file           : main.hpp
+  * @brief          : Header for main.hpp.
+  * @author			: Lawrence Stanton
   ******************************************************************************
   * @attention
   *
+  * © LD Stanton 2022
+  * 
+  * This file and its content are the copyright property of the author. All 
+  * rights are reserved. No warranty is given. No liability is assumed.
+  * Confidential unless licensed otherwise. If licensed, refer to the 
+  * accompanying file "LICENCE" for license details.
+  * 
   * Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
+  * 
   ******************************************************************************
   */
 /* USER CODE END Header */

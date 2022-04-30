@@ -3,7 +3,6 @@
   * @file           : HDC1080.cpp
   * @brief          : Source file for HDC1080 Driver
   * @author			: Lawrence Stanton
-  * @revised		: Mar 27, 2022
   ******************************************************************************
   * @attention
   *
