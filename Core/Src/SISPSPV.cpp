@@ -48,14 +48,56 @@
 
 /* --------------------------------------------------------------------------- */
 /* Begin Private Variables */
-
+const SISPSPV::GPIO SISPSPV::MPPT::pmForce 	 = GPIO(PM_FORCE_GPIO_Port,  PM_FORCE_Pin);
+const SISPSPV::GPIO SISPSPV::MPPT::pGood 	 = GPIO(PGOOD_GPIO_Port, 	 PGOOD_Pin);
+const SISPSPV::GPIO SISPSPV::eFuse::fuseOK	 = GPIO(FUSE_OK_GPIO_Port, 	 FUSE_OK_Pin);
+const SISPSPV::GPIO SISPSPV::eFuse::fuseOC	 = GPIO(FUSE_OC_GPIO_Port, 	 FUSE_OC_Pin);
+const SISPSPV::GPIO SISPSPV::EEPROM::wc		 = GPIO(EEPROM_WC_GPIO_Port, EEPROM_WC_Pin);
+const SISPSPV::GPIO SISPSPV::Backplane::stop = GPIO(STOP_GPIO_Port, 	 STOP_Pin);
+const SISPSPV::GPIO SISPSPV::Backplane::wake = GPIO(WAKE_GPIO_Port, 	 WAKE_Pin);
+const SISPSPV::GPIO SISPSPV::resetOut		 = GPIO(RST_OUT_GPIO_Port, 	 RST_OUT_Pin);
+const SISPSPV::GPIO SISPSPV::LED1			 = GPIO(LED1_GPIO_Port, 	 LED1_Pin);
+const SISPSPV::GPIO SISPSPV::LED2			 = GPIO(LED2_GPIO_Port, 	 LED2_Pin); 
+const SISPSPV::GPIO SISPSPV::LED3			 = GPIO(LED3_GPIO_Port, 	 LED3_Pin);
 
 /* End Private Variables */
 
 /* --------------------------------------------------------------------------- */
 /* Begin Source Code */
 
+constexpr SISPSPV::GPIO::GPIO(GPIO_TypeDef * port, uint16_t pin):
+	port(port), pin(pin){}
 
+
+void SISPSPV::writeLED(uint8_t n){
+	static_assert( (LED1_GPIO_Port == LED2_GPIO_Port) && (LED2_GPIO_Port == LED3_GPIO_Port) && (LED1_GPIO_Port == LED3_GPIO_Port),
+	"Assertion Error: LED1, LED2 and LED3 are not on same GPIO port" );
+	
+	if(n > 7) n = 0;
+
+	uint16_t pins = 
+		LED1_Pin * ( (n >> 0) & 0b1u ) |
+		LED2_Pin * ( (n >> 1) & 0b1u ) |
+		LED3_Pin * ( (n >> 2) & 0b1u );
+	auto pinsGPIO = GPIO(LED1_GPIO_Port, pins);
+
+	setGPIO(pinsGPIO, GPIO_PIN_SET);
+}
+
+/*************************************************************************************************************************
+ * 					STM32 Hardware Abstraction Layer Specific GPIO Implementations
+ * For convenience, the below methods are methods are suitable implementations of the I2C communication methods for
+ * STM32-based systems using the ST Microelectronics STM32 Hardware Abstraction Layer (HAL).
+ *************************************************************************************************************************/
+#define SISPS_USE_STM32_HAL_METHODS
+#ifdef SISPS_USE_STM32_HAL_METHODS
+
+#include "stm32g0xx_hal.h"	// STM32 HAL driver to be included. Adjust depending on the specific STM32 platform.
+
+
+
+
+#endif /* SISPS_USE_STM32_HAL_METHODS */
 /* End Source Code */
 
 

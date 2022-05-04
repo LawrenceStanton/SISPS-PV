@@ -1,0 +1,35 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"bit": "cpp",
+			"codecvt": "cpp",
+			"condition_variable": "cpp",
+			"cstddef": "cpp",
+			"string": "cpp",
+			"optional": "cpp",
+			"limits": "cpp",
+			"memory": "cpp",
+			"new": "cpp",
+			"functional": "cpp",
+			"__locale": "cpp",
+			"atomic": "cpp",
+			"compare": "cpp",
+			"filesystem": "cpp",
+			"ios": "cpp",
+			"locale": "cpp",
+			"type_traits": "cpp",
+			"variant": "cpp",
+			"cstdint": "cpp"
+		},
+		"cortex-debug.armToolchainPath": "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/10.3.1-2.3.1/.content/bin",
+		"cortex-debug.openocdPath": "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/openocd/0.11.0-2.1/.content/bin/openocd",
+		"cSpell.words": [
+			"efuse"
+		]
+	}
+}

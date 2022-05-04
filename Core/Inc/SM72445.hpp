@@ -74,7 +74,7 @@ class SM72445{
 	struct Offsets;
 	struct Thresholds;
 
-	SM72445(I2CAddr i2cAddr, float vInGain, float vOutGain, float iInGain, float iOutGain );
+	SM72445(I2CAddr i2cAddr, float vInGain, float vOutGain, float iInGain, float iOutGain);
 
 	ADCs getADC_Values();
 	Sensors getSensors();

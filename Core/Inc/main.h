@@ -1,22 +1,19 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.hpp
-  * @brief          : Header for main.hpp.
-  * @author			: Lawrence Stanton
+  * @file           : main.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
   *
-  * © LD Stanton 2022
-  * 
-  * This file and its content are the copyright property of the author. All 
-  * rights are reserved. No warranty is given. No liability is assumed.
-  * Confidential unless licensed otherwise. If licensed, refer to the 
-  * accompanying file "LICENCE" for license details.
-  * 
   * Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.
-  * 
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -60,6 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define RST_OUT_Pin GPIO_PIN_0
+#define RST_OUT_GPIO_Port GPIOA
 #define LED1_Pin GPIO_PIN_2
 #define LED1_GPIO_Port GPIOA
 #define LED2_Pin GPIO_PIN_3
@@ -72,6 +71,8 @@ void Error_Handler(void);
 #define FUSE_OK_GPIO_Port GPIOB
 #define PGOOD_Pin GPIO_PIN_12
 #define PGOOD_GPIO_Port GPIOB
+#define WAKE_Pin GPIO_PIN_15
+#define WAKE_GPIO_Port GPIOB
 #define PM_FORCE_Pin GPIO_PIN_8
 #define PM_FORCE_GPIO_Port GPIOA
 #define STOP_Pin GPIO_PIN_11

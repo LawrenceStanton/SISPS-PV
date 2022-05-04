@@ -16,6 +16,11 @@
   ******************************************************************************
   */
 
+/**
+ * @note This driver assumes a STM32 Hardware Abstraction Layer environment.
+ */
+
+
 #ifndef INC_SISPSPV_HPP_
 #define INC_SISPSPV_HPP_
 
@@ -23,13 +28,19 @@
 /* Begin Public Includes */
 #pragma once
 #include <stdio.h>
+#include "main.h"
 #include "SM72445.hpp"
 #include "HDC1080.hpp"
 /* End Public Includes */
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Defines */
+#define SISPSPV_BOARD_REVISION 0
 
+#define SM72445_VIN_GAIN  0.105969f
+#define SM72445_VOUT_GAIN 0.199029f
+#define SM72445_IIN_GAIN  0.8f
+#define SM72445_IOUT_GAIN 0.8f
 
 /* End Public Defines */
 
@@ -49,26 +60,76 @@
 /* Begin Public Function Prototypes */
 
 
+
 /* End Public Function Prototypes */
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Class Definitions */
-class MPPT : SM72445{
+class SISPSPV{
 	public:
+	struct GPIO{
+		GPIO_TypeDef * port;
+		uint16_t pin;
 
+		constexpr GPIO(GPIO_TypeDef * port, uint16_t pin);
+	};
 
+	class MPPT : SM72445{
+		public:
+		void forcePanelMode();
+		bool powerGood();
+
+		
+		private:
+		static const GPIO pmForce;
+		static const GPIO pGood;
+		
+	};
+
+	class eFuse{
+		public:
+		bool fuseOK();
+		bool fuseOverCurrent();
+
+		private:
+		static const GPIO fuseOK;
+		static const GPIO fuseOC;
+	};
+
+	class EEPROM{
+		private:
+		static const GPIO wc;
+
+	};
+
+	class Backplane{
+		private:
+		static const GPIO stop;
+		static const GPIO wake;
+
+	};
+
+	SISPSPV();
+
+	void writeLED(uint8_t n);
 
 	private:
-	/*************************************************************************************************************************************
-	 * System-level GPIO control methods. To be implemented by host application. */
-	template <typename PortType, typename PinType>
-	void setGPIO(PortType port, PinType pin);
+	static MPPT mppt;
+	static eFuse efuse;
+	static EEPROM eeprom;
+	static Backplane backplane;
+	static HDC1080 hdc;
 
-	template <typename PortType, typename PinType>
-	void toggleGPIO(PortType port, PinType pin);
+	static const GPIO resetOut;
+
+	static const GPIO LED1;
+	static const GPIO LED2;
+	static const GPIO LED3;
 	
-	template <typename StateType, typename PortType, typename PinType>
-	StateType readGPIO(PortType port, PinType pin);
+	static inline void delay(uint32_t ms){HAL_Delay(ms);}
+	static inline void setGPIO(GPIO gpio, GPIO_PinState pinState){HAL_GPIO_WritePin(gpio.port, gpio.pin, pinState);}
+	static inline void toggleGPIO(GPIO gpio){HAL_GPIO_TogglePin(gpio.port, gpio.pin);}
+	static inline GPIO_PinState readGPIO(GPIO gpio){return HAL_GPIO_ReadPin(gpio.port, gpio.pin);}
 };
 
 
