@@ -57,18 +57,18 @@
 /* End Private Typedefs */
 
 /* Begin Private Function Prototypes */
-
-
-/* End Private Function Prototypes */
-
-/* Begin Private Variables */
-
 /**
  * @brief Lambda functions to be used with I2C_Mutate.
  */
 static const auto lambda_set   = [](uint64_t reg, uint64_t bits, uint64_t) -> uint64_t { return reg |  bits; };
 static const auto lambda_reset = [](uint64_t reg, uint64_t bits, uint64_t) -> uint64_t { return reg & ~bits; };
 static const auto lambda_write = [](uint64_t reg, uint64_t bits, uint64_t mask) -> uint64_t { return (reg & ~mask) | (mask & bits); };
+
+
+/* End Private Function Prototypes */
+
+/* Begin Private Variables */
+
 
 /* End Private Variables */
 
@@ -147,7 +147,7 @@ SM72445::Thresholds SM72445::getThresholds(){
 template<class T>
 T SM72445::get(RegisterAddr regAddr){
 	uint64_t reg = 0x0ull;
-	I2C_MemRead((uint8_t)this->i2cAddr, (uint8_t)regAddr, reg);
+	I2C_MemRead(this->i2cAddr, regAddr, reg);
 
 	return T(reg);
 }
@@ -177,7 +177,7 @@ void SM72445::setADCOverrideFreqPM(FreqPanelMode fpm){
 
 			// "Reset the bb_reset bit, keep the over-ride bit, keep the desired PWM code."
 			reg = reg & ~SM72445_CONFIG_RESET_BIT;
-			I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)RegisterAddr::REG3, reg);
+			I2C_MemWrite(this->i2cAddr, RegisterAddr::REG3, reg);
 		}
 	}
 	else{	// Override has been done before.
@@ -194,15 +194,15 @@ void SM72445::setADCOverrideFreqPM(FreqPanelMode fpm){
 			
 			// "Reset the bb_reset bit, reset the over-ride bit, keep the desired PWM code."
 			reg = reg & ~(SM72445_CONFIG_RESET_BIT | SM72445_CONFIG_ADC_OVERRIDE_BIT);
-			if(I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)RegisterAddr::REG3, reg) == Status::OK){
+			if(I2C_MemWrite(this->i2cAddr, RegisterAddr::REG3, reg) == Status::OK){
 
 				// "Set the bb_reset bit, set the over-ride bit, keep he desired PWM code."
 				reg = reg | SM72445_CONFIG_RESET_BIT | SM72445_CONFIG_ADC_OVERRIDE_BIT;
-				if(I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)RegisterAddr::REG3, reg) == Status::OK){
+				if(I2C_MemWrite(this->i2cAddr, RegisterAddr::REG3, reg) == Status::OK){
 				
 					// "Reset the bb_reset bit, keep the over-ride bit, keep the desired PWM code.""
 					reg = reg & ~SM72445_CONFIG_RESET_BIT;
-					I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)RegisterAddr::REG3, reg);
+					I2C_MemWrite(this->i2cAddr, RegisterAddr::REG3, reg);
 				}
 			}
 		}
@@ -317,7 +317,7 @@ void SM72445::softReset(){
 	uint64_t reg = I2C_Mutate(this->i2cAddr, RegisterAddr::REG3, SM72445_CONFIG_RESET_BIT, lambda_set);
 	if(reg != 0u) {
 		reg &= ~SM72445_CONFIG_RESET_BIT;
-		I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)RegisterAddr::REG3, reg);
+		I2C_MemWrite(this->i2cAddr, RegisterAddr::REG3, reg);
 	}
 }
 
@@ -350,7 +350,7 @@ void SM72445::setThresholds(Thresholds thresholds){
  */
 template<class T>
 void SM72445::set(RegisterAddr regAddr, T reg){
-	I2C_MemWrite((uint8_t)this->i2cAddr, (uint8_t)regAddr, reg.toReg() );
+	I2C_MemWrite(this->i2cAddr, regAddr, reg.toReg() );
 }
 
 /**
@@ -627,9 +627,9 @@ template<typename T>
 uint64_t SM72445::I2C_Mutate(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bits, T&& action, uint64_t mask){
 	uint64_t reg;
 
-	if(I2C_MemRead((uint8_t)i2cAddr, (uint8_t)regAddr, reg) == Status::OK){
+	if(I2C_MemRead(i2cAddr, regAddr, reg) == Status::OK){
 		reg = action(reg, bits, mask);
-		if(I2C_MemWrite((uint8_t)i2cAddr, (uint8_t)regAddr, reg) == Status::OK)	return reg;
+		if(I2C_MemWrite(i2cAddr, regAddr, reg) == Status::OK)	return reg;
 	}
 	return 0x0ull;
 }
@@ -649,9 +649,9 @@ uint64_t SM72445::I2C_Mutate(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t bit
 extern I2C_HandleTypeDef * sm72445_hi2c;	// Pointer to the HAL I2C handle for the I2C interface that the SM72445 is on.
 											// Define this variable in main.cpp.
 
-SM72445::Status SM72445::I2C_MemRead (uint8_t i2cAddr, uint8_t regAddr, uint64_t & rData){
+SM72445::Status SM72445::I2C_MemRead (I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t & rData){
 	uint8_t bytes[SM72445_REG_SIZE+1];	// Transmission length byte at byte[0] (unused). See Fig.15 of datasheet.
-	HAL_StatusTypeDef halResult =  HAL_I2C_Mem_Read(sm72445_hi2c, (i2cAddr<<1), regAddr, 1, bytes, SM72445_REG_SIZE + 1, 500);
+	HAL_StatusTypeDef halResult =  HAL_I2C_Mem_Read(sm72445_hi2c, (static_cast<uint8_t>(i2cAddr)<<1), static_cast<uint8_t>(regAddr), 1, bytes, SM72445_REG_SIZE + 1, 500);
 
 	auto smResult = (halResult == HAL_OK) ? Status::OK : Status::FAIL_I2C;
 
@@ -661,14 +661,14 @@ SM72445::Status SM72445::I2C_MemRead (uint8_t i2cAddr, uint8_t regAddr, uint64_t
 	return smResult;
 }
 
-SM72445::Status SM72445::I2C_MemWrite(uint8_t i2cAddr, const uint8_t regAddr, uint64_t data){
+SM72445::Status SM72445::I2C_MemWrite(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t data){
 	uint8_t bytes[SM72445_REG_SIZE + 1];
 	const uint8_t mask = 0xFFu;
 
 	bytes[0] = SM72445_REG_SIZE;														// Transmission length byte
 	for(int i = 1; i < SM72445_REG_SIZE + 1; i++) bytes[i] = (data >> 8*(i-1)) & mask;	// Packing Register Data
 
-	HAL_StatusTypeDef halResult = HAL_I2C_Mem_Write(sm72445_hi2c, (i2cAddr<<1), regAddr, 1, bytes, SM72445_REG_SIZE + 1, 500);
+	HAL_StatusTypeDef halResult = HAL_I2C_Mem_Write(sm72445_hi2c, ((uint8_t)i2cAddr<<1), (uint8_t)regAddr, 1, bytes, SM72445_REG_SIZE + 1, 500);
 	return (halResult == HAL_OK) ? SM72445::Status::OK : SM72445::Status::FAIL_I2C;
 }
 

@@ -21,7 +21,7 @@
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
-#include <stdio.h>	// Used for int_t types.
+#include <stdint.h>	// Used for int_t types.
 /* End Public Includes */
 
 /* --------------------------------------------------------------------------- */

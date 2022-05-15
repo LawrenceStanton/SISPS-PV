@@ -24,11 +24,13 @@
 			"locale": "cpp",
 			"type_traits": "cpp",
 			"variant": "cpp",
-			"cstdint": "cpp"
+			"cstdint": "cpp",
+			"vector": "cpp"
 		},
 		"cortex-debug.armToolchainPath": "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/10.3.1-2.3.1/.content/bin",
 		"cortex-debug.openocdPath": "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/openocd/0.11.0-2.1/.content/bin/openocd",
 		"cSpell.words": [
+			"CFGR",
 			"efuse"
 		]
 	}

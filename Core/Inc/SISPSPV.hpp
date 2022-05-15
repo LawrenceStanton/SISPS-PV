@@ -17,20 +17,24 @@
   */
 
 /**
- * @note This driver assumes a STM32 Hardware Abstraction Layer environment.
+ * @note This driver assumes a STM32 Hardware Abstraction Layer environment and
+ * various automatically-generated definitions in main.hpp.
  */
 
 
 #ifndef INC_SISPSPV_HPP_
 #define INC_SISPSPV_HPP_
 
+using namespace std;
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
 #pragma once
-#include <stdio.h>
-#include "main.h"
+#include <stdint.h>
+#include <string>
+#include "main.hpp"
 #include "SM72445.hpp"
 #include "HDC1080.hpp"
+#include "TMP116.hpp"
 /* End Public Includes */
 
 /* --------------------------------------------------------------------------- */
@@ -67,47 +71,15 @@
 /* Begin Public Class Definitions */
 class SISPSPV{
 	public:
-	struct GPIO{
-		GPIO_TypeDef * port;
-		uint16_t pin;
+	struct GPIO;
 
-		constexpr GPIO(GPIO_TypeDef * port, uint16_t pin);
-	};
+	class MPPT;
+	class eFuse;
+	class EEPROM;
+	class Backplane;
 
-	class MPPT : SM72445{
-		public:
-		void forcePanelMode();
-		bool powerGood();
-
-		
-		private:
-		static const GPIO pmForce;
-		static const GPIO pGood;
-		
-	};
-
-	class eFuse{
-		public:
-		bool fuseOK();
-		bool fuseOverCurrent();
-
-		private:
-		static const GPIO fuseOK;
-		static const GPIO fuseOC;
-	};
-
-	class EEPROM{
-		private:
-		static const GPIO wc;
-
-	};
-
-	class Backplane{
-		private:
-		static const GPIO stop;
-		static const GPIO wake;
-
-	};
+	template<typename Handle>
+	class UART;
 
 	SISPSPV();
 
@@ -119,19 +91,83 @@ class SISPSPV{
 	static EEPROM eeprom;
 	static Backplane backplane;
 	static HDC1080 hdc;
+	static TMP116 tmp1;
+	static TMP116 tmp2;
+	static TMP116 tmp3;
+	static TMP116 tmp4;
 
 	static const GPIO resetOut;
 
 	static const GPIO LED1;
 	static const GPIO LED2;
 	static const GPIO LED3;
+	static const GPIO LEDs;
 	
 	static inline void delay(uint32_t ms){HAL_Delay(ms);}
-	static inline void setGPIO(GPIO gpio, GPIO_PinState pinState){HAL_GPIO_WritePin(gpio.port, gpio.pin, pinState);}
-	static inline void toggleGPIO(GPIO gpio){HAL_GPIO_TogglePin(gpio.port, gpio.pin);}
-	static inline GPIO_PinState readGPIO(GPIO gpio){return HAL_GPIO_ReadPin(gpio.port, gpio.pin);}
 };
 
+struct SISPSPV::GPIO{
+		GPIO_TypeDef * port;
+		uint16_t pin;
+
+		constexpr GPIO(GPIO_TypeDef * port, uint16_t pin);
+	
+		static inline void set(GPIO gpio, GPIO_PinState pinState){HAL_GPIO_WritePin(gpio.port, gpio.pin, pinState);}
+		static inline void toggle(GPIO gpio){HAL_GPIO_TogglePin(gpio.port, gpio.pin);}
+		static inline GPIO_PinState read(GPIO gpio){return HAL_GPIO_ReadPin(gpio.port, gpio.pin);}
+};
+
+class SISPSPV::MPPT : SM72445{
+	public:
+	void forcePanelMode();
+	bool powerGood();
+	
+	private:
+	static const GPIO pmForce;
+	static const GPIO pGood;
+};
+
+template<typename Handle>
+class SISPSPV::UART{
+	protected:
+
+	Handle h;
+
+	public:
+	UART(Handle handle);
+
+	void print(string str);
+	string scan();
+	void transmit(string str);
+	string receive();
+};
+
+class SISPSPV::eFuse{
+	public:
+	bool fuseOK();
+	bool fuseOverCurrent();
+
+	private:
+	static const GPIO OK;
+	static const GPIO OC;
+};
+
+class SISPSPV::Backplane{
+	public:
+
+
+	private:
+	static const GPIO stop;
+	static const GPIO wake;
+};
+
+class SISPSPV::EEPROM{
+	public:
+
+
+	private:
+	static const GPIO wc;
+};
 
 /* End Public Class Definitions */
 

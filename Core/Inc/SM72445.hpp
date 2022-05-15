@@ -23,7 +23,7 @@
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
 #pragma once
-#include <stdio.h>
+#include <stdint.h>
 /* End Public Includes */
 
 /* --------------------------------------------------------------------------- */
@@ -123,7 +123,7 @@ class SM72445{
 	 * 
 	 * @param i2cAddr	The address of the SM72445 to read from.
 	 * @param regAddr	The address of the SM72445 internal register to read from.
-	 * @param pData		Pointer to a 64-bit unsigned integer to save data to.
+	 * @param rData		Reference to a 64-bit unsigned integer to save data to.
 	 * @return SM72445::Status SM72445::Status::OK if success, else SM72445::Status::FAIL_I2C.
 	 *  
 	 * @note Set all unused bits of pData to 0.
@@ -131,14 +131,14 @@ class SM72445{
 	 * @note All bytes must be read in a single sequence.
 	 * @note Refer to Page 14 of the device datasheet for more information.
 	 */
-	static SM72445::Status I2C_MemRead (uint8_t i2cAddr, uint8_t regAddr, uint64_t & rData);
+	static SM72445::Status I2C_MemRead (I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t & rData);
 
 	/**
-	 * @brief Write a single memory register from A SM72445, given an I2C address.
+	 * @brief Write a single memory register from a SM72445, given an I2C address.
 	 * 
 	 * @param i2cAddr	The address of the SM72445 to write to.
 	 * @param regAddr	The address of the SM72445 internal register to write to.
-	 * @param pData		Pointer to a 64-bit unsigned integer to save data to.
+	 * @param data		64-bit unsigned integer of data to write.
 	 * @return SM72445::Status SM72445::Status::OK if success, else SM72445::Status::FAIL_I2C.
 	 * 
 	 * @note Set all unused bits of pData to 0.
@@ -146,7 +146,7 @@ class SM72445{
 	 * @note All bytes must be written in a single sequence.
 	 * @note Refer to Page 14 of the device datasheet for more information.
 	 */
-	static SM72445::Status I2C_MemWrite(uint8_t i2cAddr, const uint8_t regAddr, uint64_t data);
+	static SM72445::Status I2C_MemWrite(I2CAddr i2cAddr, RegisterAddr regAddr, uint64_t data);
 
 	/*************************************************************************************************************************************/
 

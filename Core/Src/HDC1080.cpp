@@ -258,7 +258,7 @@ uint16_t HDC1080::getRegister(uint8_t memAddr){
  */
 void HDC1080::setRegister(uint8_t memAddr, uint16_t data){
 	data = __HDC1080_UINT16_REVERSE_CAST(data);
-	__unused auto hdcResult = I2C_MemWrite(this->ID, HDC1080_I2C_ADDR, memAddr, (uint8_t *) &data, sizeof(data));
+	I2C_MemWrite(this->ID, HDC1080_I2C_ADDR, memAddr, (uint8_t *) &data, sizeof(data));
 }
 
 /**
