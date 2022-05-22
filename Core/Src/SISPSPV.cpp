@@ -70,7 +70,6 @@ const SISPSPV::GPIO SISPSPV::LEDs			 = GPIO(LED1_GPIO_Port, 	 LED3_Pin);
 constexpr SISPSPV::GPIO::GPIO(GPIO_TypeDef * port, uint16_t pin):
 	port(port), pin(pin){}
 
-
 void SISPSPV::writeLED(uint8_t n){
 	if(n > 7) n = 0;
 	

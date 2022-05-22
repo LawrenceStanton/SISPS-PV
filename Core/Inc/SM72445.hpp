@@ -58,13 +58,13 @@
  * @note Refer to source code definitions for all documentation on the declarations of this class.
  */
 class SM72445{
-	protected:
+protected:
 	template <typename T> struct QuadDataStruct;
 	template <typename T> struct VoltsCurrents;
 	
 	enum class Status : int;
 
-	public:
+public:
 	enum class I2CAddr : uint8_t;
 	enum class RegisterAddr : uint8_t;
 	enum class FreqPanelMode : uint8_t;
@@ -98,7 +98,7 @@ class SM72445{
 	void setThresholds(Thresholds thresholds);
 	void setOffsets(Offsets offsets);
 
-	private:
+private:
 	I2CAddr i2cAddr;
 	float vInGain, vOutGain, iInGain, iOutGain;
 	bool adcOverride = false;

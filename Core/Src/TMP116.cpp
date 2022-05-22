@@ -25,6 +25,10 @@
 
 /* --------------------------------------------------------------------------- */
 /* Begin Private Defines */
+/**
+ * @brief Masks for various bits within the TMP116 Configuration Register.
+ * 
+ */
 #define TMP116_HIGH_ALERT_MASK  static_cast<uint16_t>(0b1u   << 15)
 #define TMP116_LOW_ALERT_MASK   static_cast<uint16_t>(0b1u   << 14)
 #define TMP116_DATA_READY_MASK  static_cast<uint16_t>(0b1u   << 13)
@@ -36,7 +40,7 @@
 #define TMP116_POL_MASK			static_cast<uint16_t>(0b1u   << 3)
 #define TMP116_DR_ALERT_MASK	static_cast<uint16_t>(0b1u   << 2)
 
-#define TMP116_RESOLUTION (7.8125f * 1E-3)
+#define TMP116_RESOLUTION (7.8125f * 1E-3)	/* Resolution of the TMP116 in K/LSB. Applies to all registers reflecting temperature. */
 
 /* End Private Defines */
 
@@ -72,36 +76,86 @@ static const auto lambda_write = [](uint16_t reg, uint16_t bits, uint16_t mask) 
 /* --------------------------------------------------------------------------- */
 /* Begin Source Code */
 
+/**
+ * @brief Construct a new TMP116 object.
+ * 
+ * @param i2cAddr
+ * @param proximity
+ */
 TMP116::TMP116(I2CAddr i2cAddr, std::string proximity){
 	this->i2cAddr = i2cAddr;
 	this->proximity = proximity;
 }
 
+/**
+ * @brief Get the contents of the TMP116 temperature register.
+ * 
+ * @return int16_t Value of temperature register.
+ * @note The resolution of the register is 7.8125mK/LSB with 0x00 = 0°C.
+ */
 int16_t TMP116::getTemperatureReg(){
 	uint16_t reg;
 	auto status = I2C_MemRead(this->i2cAddr, RegisterAddr::TEMP, reg);
 	return (status == Status::OK) ? static_cast<int16_t>(reg) : -0xFF;
 }
 
+/**
+ * @brief Gets the temperature of the TMP116 in degrees Celsius.
+ * 
+ * @return float The temperature of the TMP116.
+ */
 float TMP116::getTemperature(){
 	auto tReg = getTemperatureReg();
 	float T = TMP116_RESOLUTION * tReg;
 	return T;
 }
 
+/**
+ * @brief Gets the Device ID of the TMP116.
+ * 
+ * @return uint16_t The Device ID.
+ */
 uint16_t TMP116::getDevID(){
 	uint16_t devID;
 	auto i2cResult = I2C_MemRead(this->i2cAddr, RegisterAddr::DEVICE_ID, devID);
 	return (i2cResult == Status::OK) ? devID : 0x00u;
 }
 
-inline bool TMP116::getHighAlert(){ return getConfigTrue(TMP116_HIGH_ALERT_MASK); }
+/**
+ * @brief Gets the status of the High Temperature Alert Flag.
+ * 
+ * @return true The temperature register is greater than the high temperature threshold.
+ * @return false The flag has been cleared.
+ * 
+ * @note The condition for clearing the flag depends on the current Thermal Alert Mode of the TMP116.
+ */
+bool TMP116::getHighAlert(){ return getConfigTrue(TMP116_HIGH_ALERT_MASK); }
 
-inline bool TMP116::getLowAlert(){	 return getConfigTrue(TMP116_LOW_ALERT_MASK); }
+/**
+ * @brief Gets the status of the Low Temperature Alert Flag.
+ * 
+ * @return true The temperature register is greater than the low temperature threshold.
+ * @return false The flag has been cleared.
+ * 
+ * @note The condition for clearing the flag depends on the current Thermal Alert Mode of the TMP116.
+ */
+bool TMP116::getLowAlert(){	 return getConfigTrue(TMP116_LOW_ALERT_MASK); }
 
-inline bool TMP116::dataReady(){ 	 return getConfigTrue(TMP116_DATA_READY_MASK); }
+/**
+ * @brief Gets the status of the Data Ready Flag.
+ * 
+ * @return true Data is ready.
+ * @return false The flag has been cleared by reading the temperature register.
+ */
+bool TMP116::dataReady(){ 	 return getConfigTrue(TMP116_DATA_READY_MASK); }
 
-inline bool TMP116::eepromBusy(){ 	 return getConfigTrue(TMP116_EEPROM_BUSY_MASK); }
+/**
+ * @brief Gets the status of the EEPROM Busy Flag.
+ * 
+ * @return true The EEPROM is busy.
+ * @return false The EEPROM is not busy.
+ */
+bool TMP116::eepromBusy(){ 	 return getConfigTrue(TMP116_EEPROM_BUSY_MASK); }
 
 /**
  * @brief General method for checking if the configuration register matches a given mask for certain settings.
@@ -119,43 +173,103 @@ bool TMP116::getConfigTrue(uint16_t mask){
 	return false;
 }
 
+/**
+ * @brief Sets the Conversion Mode of the TMP116.
+ * 
+ * @param mode
+ */
 void TMP116::setConversionMode(ConversionMode mode){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(mode), lambda_write, TMP116_MOD_MASK);
 }
 
-inline void TMP116::setConversionCycle(ConversionTime conv){
+/**
+ * @brief Sets the conversion cycle time (measurement period) of the TMP116.
+ * 
+ * @param conv Enumerable for the conversion time. 
+ * 
+ * @note If a high number of measurement averages are set, conversion cycles less than 1s may result in longer actual cycle times.
+ * 		 Refer to Table 7 of the TMP116 Datasheet for more information.
+ */
+void TMP116::setConversionCycle(ConversionTime conv){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(conv), lambda_write, TMP116_CONV_MASK);
 }
 
-inline void TMP116::setAverages(Averages avg){
+/**
+ * @brief Sets the number of averaged measurements per update of the TMP116 temperature register.
+ * 
+ * @param avg Enumerable for the number of averages (1, 6, 32, 64).
+ * 
+ * @note If a high number of measurement averages are set, conversion cycles less than 1s may result in longer actual cycle times.
+ * 		 Refer to Table 7 of the TMP116 Datasheet for more information.
+ */
+void TMP116::setAverages(Averages avg){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(avg), lambda_write, TMP116_AVG_MASK);
 }
 
+/**
+ * @brief Sets the mode of the TMP116 to either Thermal or Alert modes. 
+ * 
+ * @param mode Enumerable for the Thermal or Alert mode.
+ */
 void TMP116::setAlertMode(ThermAlertMode mode){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(mode), lambda_write, TMP116_THERM_ALERT_MASK);
 }
 
-inline void TMP116::setAlertPolarity(Polarity pol){
+/**
+ * @brief Sets the polatity of the SMB Alert Pin to either Active High or Active Low.
+ * 
+ * @param pol Enumerable for the polarity of the of the alert pin.
+ */
+void TMP116::setAlertPolarity(Polarity pol){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(pol), lambda_write, TMP116_POL_MASK);
 }
 
-inline void TMP116::setAlertPinMode(AlertPinMode mode){
+/**
+ * @brief Sets the alert pin to either reflect the status of either the Data Ready or the Alert flags.
+ * 
+ * @param mode enumerable for the pin mode.
+ */
+void TMP116::setAlertPinMode(AlertPinMode mode){
 	I2C_Mutate(this->i2cAddr, RegisterAddr::CFGR, static_cast<uint16_t>(mode), lambda_write, TMP116_DR_ALERT_MASK);
 }
 
-inline void TMP116::setHighLimit(int16_t limit){
+/**
+ * @brief Programs the high temperature limit to the TMP116.
+ * 
+ * @param limit Binary number reflecting the limit with 7.8125mK/LSB with 0x00 = 0°C.
+ */
+void TMP116::setHighLimit(int16_t limit){
 	I2C_MemWrite(this->i2cAddr, RegisterAddr::HIGH_LIM, (uint16_t)limit);
 }
 
+/**
+ * @brief Sets the high temperature limit of the TMP with
+ * 
+ * @param limit The limit in degrees celsius.
+ * 
+ * @note Passing a limit outside of the acceptable range will result in no action being performed.
+ */
 void TMP116::setHighLimit(float limit){
 	if((limit >= -256.0) && (limit <= 192.0))
 	setHighLimit((int16_t)(limit * TMP116_RESOLUTION));
 }
 
-inline void TMP116::setLowLimit(int16_t limit){
+/**
+ * @brief Programs the low temperature limit to the TMP116.
+ * 
+ * @param limit Binary number reflecting the limit with 7.8125mK/LSB with 0x00 = 0°C.
+ */
+void TMP116::setLowLimit(int16_t limit){
 	I2C_MemWrite(this->i2cAddr, RegisterAddr::LOW_LIM, (uint16_t)limit);
 }
 
+/**
+ * @brief Sets the low temperature limit of the TMP with
+ * 
+ * @param limit The limit in degrees celsius.
+ * 
+ * @note Passing a limit outside of the acceptable range will result in no action being performed.
+ */
 void TMP116::setLowLimit(float limit){
 	if((limit >= -256.0) && (limit <= 192.0))
 	setLowLimit((int16_t)(limit * TMP116_RESOLUTION));

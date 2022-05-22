@@ -72,6 +72,7 @@
 /* Begin Public Class Definitions */
 class TMP116{
 public:
+	/* Enumerators for various parameters. */
 	enum class I2CAddr : uint8_t;
 	enum class ConversionMode : uint16_t;
 	enum class ConversionTime : uint16_t;
@@ -80,8 +81,10 @@ public:
 	enum class Polarity : uint16_t;
 	enum class AlertPinMode : uint16_t;
 
+	/* Constructors */
 	TMP116(I2CAddr i2cAddr, std::string proximity = "");
 
+	/* Getters */
 	int16_t getTemperatureReg();
 	float getTemperature();
 	uint16_t getDevID();
@@ -91,6 +94,7 @@ public:
 	bool dataReady();
 	bool eepromBusy();
 
+	/* Setters */
 	void setConversionMode(ConversionMode mode = ConversionMode::CONTINUOUS);
 	void setConversionCycle(ConversionTime conv);
 	void setAverages(Averages avg);
@@ -104,12 +108,15 @@ public:
 	void setLowLimit(float limit);
 
 private:
+	/* Identifiers */
 	I2CAddr i2cAddr;
 	std::string proximity;
 
+	/* Internal Enumerators */
 	enum class RegisterAddr : uint8_t;
 	enum class Status : int;
 
+	/* Helper Methods */
 	bool getConfigTrue(uint16_t mask);
 
 	template<typename T>
@@ -142,11 +149,14 @@ private:
 	 */
 	static Status I2C_MemWrite(I2CAddr i2cAddr, RegisterAddr regAddr, uint16_t data);
 
+	/*************************************************************************************************************************************/
+
+	/* Enum Class Definitions */
 private:
 
 	/**
-	 * @brief TMP116 Register Map Enumerable
-	 * @note  All registers are R/W except those noted below.
+	 * @brief TMP116 Register Map
+	 * @note  All registers are R/W except those expressly noted below.
 	 */
 	enum class RegisterAddr : uint8_t{
 		TEMP 		= 0x00u,	/* Temperature register */		/* READ ONLY */
@@ -173,7 +183,6 @@ private:
 public:
 	/**
 	 * @brief TMP116 I2C Addresses Enumerable.
-	 * 
 	 */
 	enum class I2CAddr : uint8_t{
 		ADDR0 = 0b1001000u,	/* ADD0 connected to GND */
@@ -184,7 +193,6 @@ public:
 
 	/**
 	 * @brief TMP116 Conversion Modes Enumerable.
-	 * 
 	 */
 	enum class ConversionMode : uint16_t{
 		CONTINUOUS 	= 0b00 << 10,
@@ -250,7 +258,8 @@ public:
 		DATA_READY = 0b1u << 2,
 		ALERT_FLAGS = 0
 	};
-};
+	
+}; /* TMP116 */
 
 
 

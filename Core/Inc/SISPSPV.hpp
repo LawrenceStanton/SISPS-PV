@@ -70,31 +70,28 @@ using namespace std;
 /* --------------------------------------------------------------------------- */
 /* Begin Public Class Definitions */
 class SISPSPV{
-	public:
+public:
 	struct GPIO;
 
 	class MPPT;
 	class eFuse;
 	class EEPROM;
 	class Backplane;
-
-	template<typename Handle>
-	class UART;
+	class TempSensors;
+	template <typename Handle> class UART;
+	typedef HDC1080 HumdSensor;
 
 	SISPSPV();
 
 	void writeLED(uint8_t n);
 
-	private:
+private:
 	static MPPT mppt;
 	static eFuse efuse;
-	static EEPROM eeprom;
 	static Backplane backplane;
-	static HDC1080 hdc;
-	static TMP116 tmp1;
-	static TMP116 tmp2;
-	static TMP116 tmp3;
-	static TMP116 tmp4;
+	static EEPROM eeprom;
+	static HumdSensor hum;
+	static TempSensors tmp;
 
 	static const GPIO resetOut;
 
@@ -107,33 +104,33 @@ class SISPSPV{
 };
 
 struct SISPSPV::GPIO{
-		GPIO_TypeDef * port;
-		uint16_t pin;
+	GPIO_TypeDef * port;
+	uint16_t pin;
 
-		constexpr GPIO(GPIO_TypeDef * port, uint16_t pin);
-	
-		static inline void set(GPIO gpio, GPIO_PinState pinState){HAL_GPIO_WritePin(gpio.port, gpio.pin, pinState);}
-		static inline void toggle(GPIO gpio){HAL_GPIO_TogglePin(gpio.port, gpio.pin);}
-		static inline GPIO_PinState read(GPIO gpio){return HAL_GPIO_ReadPin(gpio.port, gpio.pin);}
+	constexpr GPIO(GPIO_TypeDef * port, uint16_t pin);
+
+	static inline void set(GPIO gpio, GPIO_PinState pinState){HAL_GPIO_WritePin(gpio.port, gpio.pin, pinState);}
+	static inline void toggle(GPIO gpio){HAL_GPIO_TogglePin(gpio.port, gpio.pin);}
+	static inline GPIO_PinState read(GPIO gpio){return HAL_GPIO_ReadPin(gpio.port, gpio.pin);}
 };
 
 class SISPSPV::MPPT : SM72445{
-	public:
+public:
 	void forcePanelMode();
 	bool powerGood();
 	
-	private:
+private:
 	static const GPIO pmForce;
 	static const GPIO pGood;
 };
 
 template<typename Handle>
 class SISPSPV::UART{
-	protected:
+protected:
 
 	Handle h;
 
-	public:
+public:
 	UART(Handle handle);
 
 	void print(string str);
@@ -143,30 +140,42 @@ class SISPSPV::UART{
 };
 
 class SISPSPV::eFuse{
-	public:
+public:
 	bool fuseOK();
 	bool fuseOverCurrent();
 
-	private:
+private:
 	static const GPIO OK;
 	static const GPIO OC;
 };
 
 class SISPSPV::Backplane{
-	public:
+public:
 
 
-	private:
+private:
 	static const GPIO stop;
 	static const GPIO wake;
 };
 
 class SISPSPV::EEPROM{
-	public:
+public:
 
-
-	private:
+private:
 	static const GPIO wc;
+};
+
+class SISPSPV::TempSensors {
+public:
+	TempSensors();
+	
+
+private:
+	static const TMP116 tmp1;
+	static const TMP116 tmp2;
+	static const TMP116 tmp4;
+	static const TMP116 tmp1;
+	static const GPIO smba;
 };
 
 /* End Public Class Definitions */

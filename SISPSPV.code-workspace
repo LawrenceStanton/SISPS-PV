@@ -31,7 +31,8 @@
 		"cortex-debug.openocdPath": "/Users/lawrencestanton/Library/Application Support/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/openocd/0.11.0-2.1/.content/bin/openocd",
 		"cSpell.words": [
 			"CFGR",
-			"efuse"
+			"efuse",
+			"Humd"
 		]
 	}
 }
