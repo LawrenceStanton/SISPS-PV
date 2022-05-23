@@ -16,13 +16,10 @@
   ******************************************************************************
   */
 
-/* --------------------------------------------------------------------------- */
-#ifndef INC_SM72245_HPP_
-#define INC_SM72245_HPP_
+#pragma once
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
-#pragma once
 #include <stdint.h>
 /* End Public Includes */
 
@@ -295,7 +292,5 @@ struct SM72445::Thresholds : QuadDataStruct<uint16_t>{
 	Thresholds & operator = (const Thresholds & th);
 };
 /* End Public Class Definitions */
-
-#endif /* INC_SM72245_HPP_ */
 
 /*** END OF FILE ***/

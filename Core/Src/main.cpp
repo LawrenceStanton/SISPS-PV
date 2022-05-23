@@ -54,12 +54,13 @@ UART_HandleTypeDef huart3;
 /* USER CODE BEGIN PV */
 I2C_HandleTypeDef *sm72445_hi2c = &hi2c2;
 I2C_HandleTypeDef *tmp116_hi2c = &hi2c1;
+I2C_HandleTypeDef *hdc1080_hi2c = &hi2c2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void); 
+static void MX_I2C1_Init(void);
 static void MX_I2C2_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
@@ -349,8 +350,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOA,
-			LED1_Pin | LED2_Pin | LED3_Pin | PM_FORCE_Pin | STOP_Pin,
-			GPIO_PIN_RESET);
+	LED1_Pin | LED2_Pin | LED3_Pin | PM_FORCE_Pin | STOP_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(WAKE_GPIO_Port, WAKE_Pin, GPIO_PIN_RESET);

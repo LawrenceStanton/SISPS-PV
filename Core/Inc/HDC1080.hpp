@@ -15,9 +15,7 @@
   * 
   ******************************************************************************
   */
-
-#ifndef INC_HDC1080_HPP_
-#define INC_HDC1080_HPP_
+ #pragma once
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
@@ -365,7 +363,5 @@ enum class HDC1080::Status : int{
 
 
 /* End Public Function Prototypes */
-
-#endif /* INC_HDC1080_HPP_ */
 
 /*** END OF FILE ***/

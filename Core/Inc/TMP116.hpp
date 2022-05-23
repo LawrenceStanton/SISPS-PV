@@ -16,12 +16,10 @@
   ******************************************************************************
   */
 
-#ifndef INC_TMP116_HPP_
-#define INC_TMP116_HPP_
+#pragma once
 
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
-#pragma once
 #include <stdint.h>
 #include <string>
 
@@ -265,7 +263,5 @@ public:
 
 
 /* End Public Class Definitions */
-
-#endif /* INC_TMP116_HPP_ */
 
 /*** END OF FILE ***/

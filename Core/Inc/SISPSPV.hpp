@@ -22,19 +22,18 @@
  */
 
 
-#ifndef INC_SISPSPV_HPP_
-#define INC_SISPSPV_HPP_
+#pragma once
 
-using namespace std;
 /* --------------------------------------------------------------------------- */
 /* Begin Public Includes */
-#pragma once
 #include <stdint.h>
 #include <string>
 #include "main.hpp"
 #include "SM72445.hpp"
 #include "HDC1080.hpp"
 #include "TMP116.hpp"
+
+using string  = std::string;
 /* End Public Includes */
 
 /* --------------------------------------------------------------------------- */
@@ -173,13 +172,11 @@ public:
 private:
 	static const TMP116 tmp1;
 	static const TMP116 tmp2;
+	static const TMP116 tmp3;
 	static const TMP116 tmp4;
-	static const TMP116 tmp1;
 	static const GPIO smba;
 };
 
 /* End Public Class Definitions */
-
-#endif /* INC_SISPSPV_HPP_ */
 
 /*** END OF FILE ***/
